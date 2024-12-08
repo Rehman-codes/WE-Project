@@ -120,7 +120,7 @@ const AddItem = () => {
                     </div>
                 </fieldset>
 
-                <Button type="submit" className="w-full">Submit</Button>
+                <Button type="submit" className="w-full">Add</Button>
             </form>
         </div>
     )

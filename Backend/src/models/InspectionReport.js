@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const inspectionReportSchema = new mongoose.Schema({
     inspectionItem: { type: String, required: true },
@@ -10,4 +10,6 @@ const inspectionReportSchema = new mongoose.Schema({
     notes: { type: String }
 });
 
-module.exports = mongoose.model('InspectionReport', inspectionReportSchema);
+const InspectionReport = mongoose.model('InspectionReport', inspectionReportSchema);
+
+export default InspectionReport;

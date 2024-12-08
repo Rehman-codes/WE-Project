@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const supplierSchema = new mongoose.Schema({
     supplierName: { type: String, required: true },
@@ -8,4 +8,6 @@ const supplierSchema = new mongoose.Schema({
     companyName: { type: String, required: true }
 });
 
-module.exports = mongoose.model('Supplier', supplierSchema);
+const Supplier = mongoose.model('Supplier', supplierSchema);
+
+export default Supplier;

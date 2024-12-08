@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const contractSchema = new mongoose.Schema({
     contractTitle: { type: String, required: true },
@@ -8,4 +8,6 @@ const contractSchema = new mongoose.Schema({
     termsAndConditions: { type: String, required: true }
 });
 
-module.exports = mongoose.model('Contract', contractSchema);
+const Contract = mongoose.model('Contract', contractSchema);
+
+export default Contract;
