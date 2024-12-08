@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { CalendarIcon } from 'lucide-react'
 
+const dummySuppliers = ["Supplier A", "Supplier B", "Supplier C"];
 const orderItems = ["Widget A", "Gadget B", "Tool C", "Device D", "Product E"]
 const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]
 
@@ -66,11 +67,21 @@ const AllOrders = () => {
                             <TableRow key={order.id}>
                                 <TableCell>{order.id}</TableCell>
                                 <TableCell>
-                                    <Input
+                                    <Select
                                         value={order.supplierName}
-                                        onChange={(e) => handleChange(order.id, "supplierName", e.target.value)}
-                                        className="w-full"
-                                    />
+                                        onValueChange={(value) => handleChange(order.id, "supplierName", value)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue>{order.supplierName}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {dummySuppliers.map((supplier) => (
+                                                <SelectItem key={supplier} value={supplier}>
+                                                    {supplier}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </TableCell>
                                 <TableCell>
                                     <DatePicker

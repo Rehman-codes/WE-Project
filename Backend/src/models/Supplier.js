@@ -5,7 +5,8 @@ const supplierSchema = new mongoose.Schema({
     email: { type: String, required: true },
     phone: { type: String, required: true },
     address: { type: String, required: true },
-    companyName: { type: String, required: true }
+    companyName: { type: String, required: true },
+    performance: { type: String, required: true },
 });
 
 const Supplier = mongoose.model('Supplier', supplierSchema);
