@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 const categories = ['Electronics', 'Clothing', 'Food', 'Books', 'Toys']
 const locations = ['Warehouse A', 'Warehouse B', 'Store Front', 'Back Office']
 const suppliers = ['Supplier A', 'Supplier B', 'Supplier C', 'Supplier D']
-const qualityStandards = ['ISO 9001', 'CE', 'FDA', 'USDA Organic']
 
 const AddItem = () => {
     const [formData, setFormData] = useState({
@@ -21,14 +20,7 @@ const AddItem = () => {
         reorderPoint: '',
         unitPrice: '',
         stockLocation: '',
-        supplier: '',
-        expirationDetails: '',
-        qualityStandard: '',
-        brandName: '',
-        tagsKeywords: '',
-        weight: '',
-        image: '',
-        notes: ''
+        supplier: ''
     })
 
     const handleInputChange = (e) => {
@@ -125,49 +117,6 @@ const AddItem = () => {
                                 ))}
                             </SelectContent>
                         </Select>
-                    </div>
-                </fieldset>
-
-                <fieldset className="mb-6">
-                    <legend className="text-lg font-semibold mb-2">Additional Details</legend>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="expirationDetails">Expiration Details</Label>
-                            <Input id="expirationDetails" name="expirationDetails" value={formData.expirationDetails} onChange={handleInputChange} />
-                        </div>
-                        <div>
-                            <Label htmlFor="qualityStandard">Quality Standard</Label>
-                            <Select name="qualityStandard" onValueChange={handleSelectChange('qualityStandard')}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select quality standard" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {qualityStandards.map(standard => (
-                                        <SelectItem key={standard} value={standard}>{standard}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label htmlFor="brandName">Brand Name</Label>
-                            <Input id="brandName" name="brandName" value={formData.brandName} onChange={handleInputChange} />
-                        </div>
-                        <div>
-                            <Label htmlFor="tagsKeywords">Tags/Keywords</Label>
-                            <Input id="tagsKeywords" name="tagsKeywords" value={formData.tagsKeywords} onChange={handleInputChange} />
-                        </div>
-                        <div>
-                            <Label htmlFor="weight">Weight</Label>
-                            <Input id="weight" name="weight" value={formData.weight} onChange={handleInputChange} />
-                        </div>
-                        <div>
-                            <Label htmlFor="image">Image URL</Label>
-                            <Input id="image" name="image" value={formData.image} onChange={handleInputChange} />
-                        </div>
-                        <div className="col-span-2">
-                            <Label htmlFor="notes">Notes/Remarks</Label>
-                            <Textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} />
-                        </div>
                     </div>
                 </fieldset>
 
