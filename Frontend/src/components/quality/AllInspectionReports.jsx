@@ -1,49 +1,100 @@
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input} from "@/components/ui/input"
-import {Textarea} from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
-const itemNames = ["Item A", "Item B", "Item C", "Item D", "Item E"]
-const supplierNames = ["Supplier X", "Supplier Y", "Supplier Z"]
-const qualityCheckOptions = ["Pass", "Fail"]
-const quantityCheckOptions = ["Correct", "Incorrect"]
+const itemNames = ["Item A", "Item B", "Item C", "Item D", "Item E"];
+const supplierNames = ["Supplier X", "Supplier Y", "Supplier Z"];
+const qualityCheckOptions = ["Pass", "Fail"];
+const quantityCheckOptions = ["Correct", "Incorrect"];
 
 const AllInspectionReports = () => {
-    const [reports, setReports] = useState([
-        {
-            id: 1,
-            itemName: "Item A",
-            supplierName: "Supplier X",
-            inspectionDate: new Date(),
-            qualityCheck: "Pass",
-            quantityCheck: "Correct",
-            inspector: "Inspector 1",
-            notes: "",
-        },
-    ])
+    const [reports, setReports] = useState([]);
 
+    // Fetch inspection reports from the API when the component mounts
+    useEffect(() => {
+        const fetchReports = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/inspectionReport/all");
+                if (response.ok) {
+                    const data = await response.json();
+                    setReports(data);
+                    console.log(data);
+
+                } else {
+                    alert("Failed to load inspection reports.");
+                }
+            } catch (error) {
+                console.error("Error fetching inspection reports:", error);
+                alert("Error fetching inspection reports.");
+            }
+        };
+
+        fetchReports();
+    }, []);
+
+    // Update inspection report in local state and send API request to update the database
     const handleChange = (id, field, value) => {
-        setReports((prevReports) =>
-            prevReports.map((report) =>
-                report.id === id
-                    ? {
-                        ...report,
-                        [field]: value,
-                    }
+        setReports((prevReports) => {
+            const updatedReports = prevReports.map((report) =>
+                report._id === id
+                    ? { ...report, [field]: value }
                     : report
-            )
-        )
-    }
+            );
+            const updatedReport = updatedReports.find((report) => report._id === id); // Find the updated report
+            handleUpdate(updatedReport); // Pass the updated report directly
+            return updatedReports;
+        });
+    };
 
-    const handleDelete = (id) => {
-        setReports((prevReports) => prevReports.filter((report) => report.id !== id))
-    }
+    // API call to update inspection report
+    const handleUpdate = async (updatedReport) => {
+        try {
+            const response = await fetch(`http://localhost:3000/inspectionReport/${updatedReport._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedReport),
+            });
+
+            if (response.ok) {
+                console.log("Inspection report updated successfully");
+            } else {
+                alert("Failed to update inspection report");
+            }
+        } catch (error) {
+            console.error("Error updating inspection report:", error);
+            alert("Error updating inspection report");
+        }
+    };
+
+
+
+    // API call to delete inspection report
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/inspectionReport/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                setReports((prevReports) => prevReports.filter((report) => report._id !== id));
+                console.log("Inspection report deleted successfully");
+            } else {
+                alert("Failed to delete inspection report");
+            }
+        } catch (error) {
+            console.error("Error deleting inspection report:", error);
+            alert("Error deleting inspection report");
+        }
+    };
 
     return (
         <div className="flex justify-center items-center">
@@ -63,16 +114,16 @@ const AllInspectionReports = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {reports.map((report) => (
-                            <TableRow key={report.id}>
-                                <TableCell>{report.id}</TableCell>
+                        {reports.map((report, index) => (
+                            <TableRow key={report._id}>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>
                                     <Select
-                                        value={report.itemName}
-                                        onValueChange={(value) => handleChange(report.id, "itemName", value)}
+                                        value={report.inspectionItem}
+                                        onValueChange={(value) => handleChange(report._id, "inspectionItem", value)}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue>{report.itemName}</SelectValue>
+                                            <SelectValue>{report.inspectionItem}</SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {itemNames.map((item) => (
@@ -85,11 +136,11 @@ const AllInspectionReports = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Select
-                                        value={report.supplierName}
-                                        onValueChange={(value) => handleChange(report.id, "supplierName", value)}
+                                        value={report.supplier}
+                                        onValueChange={(value) => handleChange(report._id, "supplier", value)}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue>{report.supplierName}</SelectValue>
+                                            <SelectValue>{report.supplier}</SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {supplierNames.map((supplier) => (
@@ -103,13 +154,13 @@ const AllInspectionReports = () => {
                                 <TableCell>
                                     <DatePicker
                                         date={report.inspectionDate}
-                                        onSelect={(date) => handleChange(report.id, "inspectionDate", date)}
+                                        onSelect={(date) => handleChange(report._id, "inspectionDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Select
                                         value={report.qualityCheck}
-                                        onValueChange={(value) => handleChange(report.id, "qualityCheck", value)}
+                                        onValueChange={(value) => handleChange(report._id, "qualityCheck", value)}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue>{report.qualityCheck}</SelectValue>
@@ -126,7 +177,7 @@ const AllInspectionReports = () => {
                                 <TableCell>
                                     <Select
                                         value={report.quantityCheck}
-                                        onValueChange={(value) => handleChange(report.id, "quantityCheck", value)}
+                                        onValueChange={(value) => handleChange(report._id, "quantityCheck", value)}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue>{report.quantityCheck}</SelectValue>
@@ -143,19 +194,19 @@ const AllInspectionReports = () => {
                                 <TableCell>
                                     <Input
                                         value={report.inspector}
-                                        readOnly
-                                        className="w-full bg-gray-100"
+                                        onChange={(e) => handleChange(report._id, "inspector", e.target.value)}
+                                        className="w-full"
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Textarea
                                         value={report.notes}
-                                        onChange={(e) => handleChange(report.id, "notes", e.target.value)}
+                                        onChange={(e) => handleChange(report._id, "notes", e.target.value)}
                                         className="w-full"
                                     />
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="destructive" onClick={() => handleDelete(report.id)}>
+                                    <Button variant="destructive" onClick={() => handleDelete(report._id)}>
                                         Delete
                                     </Button>
                                 </TableCell>
@@ -165,8 +216,8 @@ const AllInspectionReports = () => {
                 </Table>
             </div>
         </div>
-    )
-}
+    );
+};
 
 function DatePicker({ date, onSelect }) {
     return (
@@ -181,7 +232,7 @@ function DatePicker({ date, onSelect }) {
                 <Calendar mode="single" selected={date || undefined} onSelect={onSelect} initialFocus />
             </PopoverContent>
         </Popover>
-    )
-};
+    );
+}
 
 export default AllInspectionReports;

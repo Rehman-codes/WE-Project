@@ -11,12 +11,82 @@ import { Textarea } from "../ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 const CreateInspectionReport = () => {
-    const [inspectionDate, setInspectionDate] = useState(null)
+    // Initialize form state using an object
+    const [formData, setFormData] = useState({
+        inspectionItem: '',
+        supplier: '',
+        inspectionDate: null,
+        qualityCheck: '',
+        quantityCheck: '',
+        inspector: '',
+        notes: ''
+    })
+    const [error, setError] = useState('')
 
-    const handleSubmit = (event) => {
+    // Handle input changes for all fields
+    const handleChange = (e) => {
+        const { id, value } = e.target
+        setFormData((prevData) => ({
+            ...prevData,
+            [id]: value
+        }))
+    }
+
+    const handleSelectChange = (field, value) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [field]: value
+        }))
+    }
+
+    // Handle form submission
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        // Handle form submission here
-        console.log('Form submitted')
+
+        // Check if the inspection date is selected
+        if (!formData.inspectionDate) {
+            setError('Inspection date is required.')
+            return
+        }
+
+        // Check for other required fields (no custom validation needed here as "required" HTML attribute handles that)
+        if (!formData.inspectionItem || !formData.supplier || !formData.qualityCheck || !formData.quantityCheck || !formData.inspector) {
+            setError('All fields are required.')
+            return
+        }
+
+        // Prepare the data to be sent
+        const reportData = { ...formData }
+
+        try {
+            // Send the data to the API (you can replace the URL with the actual one)
+            const response = await fetch("http://localhost:3000/inspectionReport/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(reportData)
+            })
+
+            if (response.ok) {
+                console.log("Inspection Report created successfully");
+                // Reset form after successful submission
+                setFormData({
+                    inspectionItem: '',
+                    supplier: '',
+                    inspectionDate: null,
+                    qualityCheck: '',
+                    quantityCheck: '',
+                    inspector: '',
+                    notes: ''
+                })
+            } else {
+                setError("Failed to create inspection report.")
+            }
+        } catch (error) {
+            console.error(error)
+            setError("Error creating inspection report.")
+        }
     }
 
     return (
@@ -27,10 +97,16 @@ const CreateInspectionReport = () => {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* Inspection Item */}
                         <div className="space-y-2">
                             <Label htmlFor="inspectionItem">Inspection Item</Label>
-                            <Select required>
-                                <SelectTrigger id="inspectionItem">
+                            <Select
+                                id="inspectionItem"
+                                value={formData.inspectionItem}
+                                onValueChange={(value) => handleSelectChange('inspectionItem', value)}
+                                required
+                            >
+                                <SelectTrigger>
                                     <SelectValue placeholder="Select item" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -41,10 +117,16 @@ const CreateInspectionReport = () => {
                             </Select>
                         </div>
 
+                        {/* Supplier Name */}
                         <div className="space-y-2">
                             <Label htmlFor="supplier">Supplier name</Label>
-                            <Select required>
-                                <SelectTrigger id="supplier">
+                            <Select
+                                id="supplier"
+                                value={formData.supplier}
+                                onValueChange={(value) => handleSelectChange('supplier', value)}
+                                required
+                            >
+                                <SelectTrigger>
                                     <SelectValue placeholder="Select supplier" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -55,33 +137,41 @@ const CreateInspectionReport = () => {
                             </Select>
                         </div>
 
+                        {/* Inspection Date */}
                         <div className="space-y-2">
                             <Label htmlFor="inspectionDate">Inspection date</Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant={"outline"}
-                                        className={`w-full justify-start text-left font-normal ${!inspectionDate && "text-muted-foreground"}`}
+                                        className={`w-full justify-start text-left font-normal ${!formData.inspectionDate && "text-muted-foreground"}`}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {inspectionDate ? format(inspectionDate, "PPP") : <span>Pick a date</span>}
+                                        {formData.inspectionDate ? format(formData.inspectionDate, "PPP") : <span>Pick a date</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0">
                                     <Calendar
                                         mode="single"
-                                        selected={inspectionDate}
-                                        onSelect={setInspectionDate}
+                                        selected={formData.inspectionDate}
+                                        onSelect={(date) => handleSelectChange('inspectionDate', date)}
                                         initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
+                            {error && <p className="text-red-500">{error}</p>}
                         </div>
 
+                        {/* Quality Check */}
                         <div className="space-y-2">
                             <Label htmlFor="qualityCheck">Quality check</Label>
-                            <Select required>
-                                <SelectTrigger id="qualityCheck">
+                            <Select
+                                id="qualityCheck"
+                                value={formData.qualityCheck}
+                                onValueChange={(value) => handleSelectChange('qualityCheck', value)}
+                                required
+                            >
+                                <SelectTrigger>
                                     <SelectValue placeholder="Select quality check" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -91,10 +181,16 @@ const CreateInspectionReport = () => {
                             </Select>
                         </div>
 
+                        {/* Quantity Check */}
                         <div className="space-y-2">
                             <Label htmlFor="quantityCheck">Quantity check</Label>
-                            <Select required>
-                                <SelectTrigger id="quantityCheck">
+                            <Select
+                                id="quantityCheck"
+                                value={formData.quantityCheck}
+                                onValueChange={(value) => handleSelectChange('quantityCheck', value)}
+                                required
+                            >
+                                <SelectTrigger>
                                     <SelectValue placeholder="Select quantity check" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -104,20 +200,35 @@ const CreateInspectionReport = () => {
                             </Select>
                         </div>
 
+                        {/* Inspector */}
                         <div className="space-y-2">
                             <Label htmlFor="inspector">Inspector</Label>
-                            <Input id="inspector" type="text" value="John Doe" disabled />
+                            <Input
+                                id="inspector"
+                                type="text"
+                                value={formData.inspector}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
+                        {/* Notes */}
                         <div className="space-y-2">
                             <Label htmlFor="notes">Notes/Issues</Label>
-                            <Textarea id="notes"></Textarea>
+                            <Textarea
+                                id="notes"
+                                value={formData.notes}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="mt-4">
+                            <Button type="submit" className="w-full">Create</Button>
                         </div>
                     </form>
                 </CardContent>
-                <CardFooter>
-                    <Button type="submit" className="w-full">Create</Button>
-                </CardFooter>
+                <CardFooter />
             </Card>
         </div>
     )
