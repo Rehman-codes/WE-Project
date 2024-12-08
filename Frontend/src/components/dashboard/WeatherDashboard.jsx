@@ -34,12 +34,6 @@ export default function WeatherDashboard() {
     }
   }, [])
 
-  const getWeatherBackground = () => {
-    if (!weather) return 'clouds'
-    const condition = weather.weather[0].main.toLowerCase()
-    return condition
-  }
-
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -58,24 +52,15 @@ export default function WeatherDashboard() {
 
   return (
     <main className={`shadow rounded h-[95vh] flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-background to-background/50`}>
-      {/* Dynamic weather background */}
-      <div 
-        className={`absolute inset-0 transition-opacity duration-1000 bg-cover bg-center`}
-        style={{
-          backgroundImage: `url(/weather-backgrounds/${getWeatherBackground()}.jpg)`,
-          opacity: 0.5
-        }}
-      />
+      {/* Static background image */}
+      <div
+  className="absolute inset-0 transition-opacity duration-1000 bg-cover bg-center"
+  style={{
+    backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url(https://img.freepik.com/free-photo/fantastic-cloudscape_1232-490.jpg?ga=GA1.1.916720262.1729195433&semt=ais_hybrid)`,
+    opacity: 1, // Full opacity for clarity
+  }}
+/>
 
-      {/* Weather animations */}
-      <div className="absolute inset-0 pointer-events-none">
-        {getWeatherBackground() === 'rain' && (
-          <div className="rain-animation" />
-        )}
-        {getWeatherBackground() === 'snow' && (
-          <div className="snow-animation" />
-        )}
-      </div>
 
       {/* Content */}
       <div className="relative z-10 text-center">

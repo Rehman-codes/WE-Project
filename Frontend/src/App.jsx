@@ -9,6 +9,7 @@ import Orders from './pages/Orders';
 import Suppliers from './pages/Suppliers';
 import Quality from './pages/Quality';
 import Analytics from './pages/Analytics';
+import WeatherDashboard from './components/dashboard/WeatherDashboard';
 
 // Inventory Components
 import AddItem from './components/inventory/AddItem';
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       // Dashboard
-      { path: "dashboard", element: <Dashboard /> },
+      { path: "dashboard", element: <WeatherDashboard /> },
 
       // Inventory Management
       {
