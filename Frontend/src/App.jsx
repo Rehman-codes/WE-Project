@@ -23,7 +23,8 @@ import AllOrders from './components/orders/AllOrders';
 // Supplier Components
 import AddSupplier from './components/suppliers/AddSupplier';
 import AllSuppliers from './components/suppliers/AllSuppliers';
-import Contracts from './components/suppliers/Contracts';
+import CreateContract from './components/suppliers/CreateContract';
+import AllContracts from './components/suppliers/AllContracts';
 
 // Quality Components
 import CreateInspectionReport from './components/quality/CreateInspectionReport';
@@ -51,9 +52,10 @@ const router = createBrowserRouter([
 
       // Order Management
       {
-        path: "orders",
+        path: "order",
         element: <Orders />,
         children: [
+          { index: true, element: <CreateOrder /> },
           { path: "create", element: <CreateOrder /> },
           { path: "all", element: <AllOrders /> },
         ],
@@ -61,12 +63,14 @@ const router = createBrowserRouter([
 
       // Supplier Management
       {
-        path: "suppliers",
+        path: "supplier",
         element: <Suppliers />,
         children: [
+          { index: true, element: <AddSupplier /> },
           { path: "add", element: <AddSupplier /> },
           { path: "all", element: <AllSuppliers /> },
-          { path: "contracts", element: <Contracts /> },
+          { path: "create", element: <CreateContract /> },
+          { path: "view", element: <AllContracts /> },
         ],
       },
 
@@ -75,8 +79,9 @@ const router = createBrowserRouter([
         path: "quality",
         element: <Quality />,
         children: [
-          { path: "create-report", element: <CreateInspectionReport /> },
-          { path: "all-reports", element: <AllInspectionReports /> },
+          { index: true, element: <CreateInspectionReport /> },
+          { path: "create", element: <CreateInspectionReport /> },
+          { path: "all", element: <AllInspectionReports /> },
         ],
       },
 

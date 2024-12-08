@@ -9,8 +9,8 @@ function Sidebar() {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
     { icon: Package, label: 'Inventory', to: '/inventory' },
-    { icon: ShoppingCart, label: 'Orders', to: '/orders' },
-    { icon: Truck, label: 'Suppliers', to: '/suppliers' },
+    { icon: ShoppingCart, label: 'Orders', to: '/order' },
+    { icon: Truck, label: 'Suppliers', to: '/supplier' },
     { icon: Shield, label: 'Quality', to: '/quality' },
     { icon: PieChart, label: 'Analytics', to: '/analytics' },
   ];
