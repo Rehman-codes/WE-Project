@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 // Dummy data for dropdowns
-const categories = ['Electronics', 'Clothing', 'Food', 'Books', 'Toys']
-const locations = ['Warehouse A', 'Warehouse B', 'Store Front', 'Back Office']
-const suppliers = ['Supplier A', 'Supplier B', 'Supplier C', 'Supplier D']
+const categories = ['Electronics', 'Clothing', 'Food', 'Books', 'Toys'];
+const locations = ['Warehouse A', 'Warehouse B', 'Store Front', 'Back Office'];
+const suppliers = ['Supplier A', 'Supplier B', 'Supplier C', 'Supplier D'];
 
 const AddItem = () => {
     const [formData, setFormData] = useState({
@@ -21,22 +21,62 @@ const AddItem = () => {
         unitPrice: '',
         stockLocation: '',
         supplier: ''
-    })
+    });
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prevState => ({ ...prevState, [name]: value }))
-    }
+        const { name, value } = e.target;
+        setFormData(prevState => ({ ...prevState, [name]: value }));
+    };
 
     const handleSelectChange = (name) => (value) => {
-        setFormData(prevState => ({ ...prevState, [name]: value }))
-    }
+        setFormData(prevState => ({ ...prevState, [name]: value }));
+    };
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        console.log(formData)
-        // Here you would typically send the data to your backend
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            const response = await fetch(`${API_URL}/item/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add item');
+            }
+
+            const newItem = await response.json();
+            // Optionally handle the response, such as showing a success message or redirecting
+            console.log('Item added:', newItem);
+
+            // Reset form data after successful submission
+            setFormData({
+                itemName: '',
+                itemDescription: '',
+                itemCategory: '',
+                itemSKU: '',
+                quantity: '',
+                reorderPoint: '',
+                unitPrice: '',
+                stockLocation: '',
+                supplier: ''
+            });
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div>
@@ -120,10 +160,13 @@ const AddItem = () => {
                     </div>
                 </fieldset>
 
-                <Button type="submit" className="w-full">Add</Button>
+                {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? 'Adding...' : 'Add Item'}
+                </Button>
             </form>
         </div>
-    )
+    );
 };
 
 export default AddItem;
