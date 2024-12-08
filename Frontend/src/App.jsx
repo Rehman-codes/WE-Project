@@ -42,6 +42,7 @@ const router = createBrowserRouter([
         path: "inventory",
         element: <Inventory />,
         children: [
+          { index: true, element: <AddItem /> }, // Default route for inventory
           { path: "add", element: <AddItem /> },
           { path: "all", element: <AllItems /> },
           { path: "adjustments", element: <Adjustments /> },
