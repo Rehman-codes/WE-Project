@@ -1,37 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const Adjustments = () => {
-    const [issues, setIssues] = useState([
-        { id: 1, type: 'Type 1', name: 'Item 1', quantity: 10, priority: 'High', date: '2023-10-01', reportedBy: 'User 1', location: 'Location 1', resolved: false },
-        { id: 2, type: 'Type 2', name: 'Item 2', quantity: 5, priority: 'Medium', date: '2023-10-02', reportedBy: 'User 2', location: 'Location 2', resolved: false },
-    ]);
+    const [issues, setIssues] = useState([]);
+    const API_URL = import.meta.env.VITE_API_URL;
 
-    const toggleResolveIssue = (id) => {
-        setIssues(issues.map(issue => issue.id === id ? { ...issue, resolved: !issue.resolved } : issue));
+    // Fetch adjustments from the API
+    const fetchAdjustments = async () => {
+        try {
+            const response = await fetch(`${API_URL}/adjustment/all`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch adjustments');
+            }
+            const data = await response.json();
+            setIssues(data);
+        } catch (error) {
+            console.error("Error fetching adjustments:", error.message);
+        }
     };
 
-    const removeIssue = (id) => {
-        setIssues(issues.filter(issue => issue.id !== id));
+    const toggleResolveIssue = async (id, currentResolvedStatus) => {
+        try {
+            const response = await fetch(`${API_URL}/adjustment/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolved: !currentResolvedStatus }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update adjustment');
+            }
+            const updatedIssue = await response.json();
+            setIssues(issues.map(issue => issue._id === id ? updatedIssue : issue));
+        } catch (error) {
+            console.error("Error updating adjustment:", error.message);
+        }
     };
+
+    const removeIssue = async (id) => {
+        try {
+            const response = await fetch(`${API_URL}/adjustment/${id}`, { method: 'DELETE' });
+            if (!response.ok) {
+                throw new Error('Failed to delete adjustment');
+            }
+            setIssues(issues.filter(issue => issue._id !== id));
+        } catch (error) {
+            console.error("Error deleting adjustment:", error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchAdjustments();
+    }, []);
 
     return (
         <div className='flex justify-center flex-wrap gap-5'>
             {issues.map(issue => (
                 <Card
-                    key={issue.id}
+                    key={issue._id}
                     style={{
                         padding: '20px',
                         width: '250px',
-                        height: '300px',
+                        height: 'auto',
                         boxSizing: 'border-box',
                         transition: 'opacity 0.3s ease'
                     }}
                 >
                     <div
                         style={{
-                            color: issue.resolved ? '#999' : '#000', // Gray out text if resolved
+                            color: issue.resolved ? '#999' : '#000',
                             textDecoration: issue.resolved ? 'line-through' : 'none'
                         }}
                     >
@@ -39,15 +76,15 @@ const Adjustments = () => {
                         <div className='mb-2'><strong>Item name:</strong><span className="text-gray-500"> {issue.name}</span></div>
                         <div className='mb-2'><strong>Quantity affected:</strong><span className="text-gray-500"> {issue.quantity}</span></div>
                         <div className='mb-2'><strong>Priority:</strong><span className="text-gray-500"> {issue.priority}</span></div>
-                        <div className='mb-2'><strong>Date reported:</strong><span className="text-gray-500"> {issue.date}</span></div>
+                        <div className='mb-2'><strong>Date reported:</strong><span className="text-gray-500"> {new Date(issue.date).toLocaleDateString()}</span></div>
                         <div className='mb-2'><strong>Reported by:</strong><span className="text-gray-500"> {issue.reportedBy}</span></div>
                         <div className='mb-2'><strong>Location:</strong><span className="text-gray-500"> {issue.location}</span></div>
                     </div>
                     <div className='flex flex-row justify-center items-center mt-4 gap-2'>
                         <Button
-                            onClick={() => toggleResolveIssue(issue.id)}
+                            onClick={() => toggleResolveIssue(issue._id, issue.resolved)}
                             style={{
-                                backgroundColor: issue.resolved ? '#5cb85c' : '#272e3f', // Green for "Retain"
+                                backgroundColor: issue.resolved ? '#5cb85c' : '#272e3f',
                                 color: '#fff',
                                 border: 'none',
                                 padding: '8px 16px',
@@ -58,7 +95,7 @@ const Adjustments = () => {
                             {issue.resolved ? 'Retain' : 'Resolve'}
                         </Button>
                         <Button
-                            onClick={() => removeIssue(issue.id)}
+                            onClick={() => removeIssue(issue._id)}
                             style={{
                                 backgroundColor: '#ef5656',
                                 color: '#fff',
