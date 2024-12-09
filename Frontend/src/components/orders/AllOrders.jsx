@@ -1,48 +1,96 @@
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon } from 'lucide-react';
 
 const dummySuppliers = ["Supplier A", "Supplier B", "Supplier C"];
-const orderItems = ["Widget A", "Gadget B", "Tool C", "Device D", "Product E"]
-const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]
+const orderItems = ["Widget A", "Gadget B", "Tool C", "Device D", "Product E"];
+const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 const AllOrders = () => {
-    const [orders, setOrders] = useState([
-        {
-            id: 1,
-            supplierName: "Acme Corp",
-            orderDate: new Date(),
-            deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            orderItem: "Widget A",
-            itemQuantity: 100,
-            status: "Pending",
-            paymentDate: null,
-            totalPrice: 999.99,
-        },
-    ])
+    const [orders, setOrders] = useState([]);
 
+    // Fetch orders from the API when the component mounts
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/order/all");
+                if (response.ok) {
+                    const data = await response.json();
+                    setOrders(data);
+                    console.log(data);
+                } else {
+                    alert("Failed to load orders.");
+                }
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                alert("Error fetching orders.");
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
+    // Update handleChange to directly call handleUpdate with the updated order
     const handleChange = (id, field, value) => {
-        setOrders((prevOrders) =>
-            prevOrders.map((order) =>
-                order.id === id
-                    ? {
-                        ...order,
-                        [field]: value,
-                    }
+        setOrders((prevOrders) => {
+            const updatedOrders = prevOrders.map((order) =>
+                order._id === id
+                    ? { ...order, [field]: value }
                     : order
-            )
-        )
-    }
+            );
+            const updatedOrder = updatedOrders.find((order) => order._id === id);
+            handleUpdate(updatedOrder); // Pass the updated order directly
+            return updatedOrders;
+        });
+    };
 
-    const handleDelete = (id) => {
-        setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id))
-    }
+    // Modify handleUpdate to accept the updated order and update the DB
+    const handleUpdate = async (updatedOrder) => {
+        try {
+            const response = await fetch(`http://localhost:3000/order/${updatedOrder._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedOrder),
+            });
+
+            if (response.ok) {
+                console.log("Order updated successfully");
+            } else {
+                alert("Failed to update order");
+            }
+        } catch (error) {
+            console.error("Error updating order:", error);
+            alert("Error updating order");
+        }
+    };
+
+
+    // API call to delete order
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/order/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                setOrders((prevOrders) => prevOrders.filter((order) => order._id !== id));
+                console.log("Order deleted successfully");
+            } else {
+                alert("Failed to delete order");
+            }
+        } catch (error) {
+            console.error("Error deleting order:", error);
+            alert("Error deleting order");
+        }
+    };
 
     return (
         <div className="flex justify-center items-center">
@@ -63,16 +111,16 @@ const AllOrders = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.map((order) => (
-                            <TableRow key={order.id}>
-                                <TableCell>{order.id}</TableCell>
+                        {orders.map((order, index) => (
+                            <TableRow key={order._id}>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>
                                     <Select
-                                        value={order.supplierName}
-                                        onValueChange={(value) => handleChange(order.id, "supplierName", value)}
+                                        value={order.supplier}
+                                        onValueChange={(value) => handleChange(order._id, "supplier", value)}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue>{order.supplierName}</SelectValue>
+                                            <SelectValue>{order.supplier}</SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {dummySuppliers.map((supplier) => (
@@ -86,19 +134,19 @@ const AllOrders = () => {
                                 <TableCell>
                                     <DatePicker
                                         date={order.orderDate}
-                                        onSelect={(date) => handleChange(order.id, "orderDate", date)}
+                                        onSelect={(date) => handleChange(order._id, "orderDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <DatePicker
                                         date={order.deliveryDate}
-                                        onSelect={(date) => handleChange(order.id, "deliveryDate", date)}
+                                        onSelect={(date) => handleChange(order._id, "deliveryDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Select
                                         value={order.orderItem}
-                                        onValueChange={(value) => handleChange(order.id, "orderItem", value)}
+                                        onValueChange={(value) => handleChange(order._id, "orderItem", value)}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue>{order.orderItem}</SelectValue>
@@ -115,15 +163,15 @@ const AllOrders = () => {
                                 <TableCell>
                                     <Input
                                         type="number"
-                                        value={order.itemQuantity}
-                                        onChange={(e) => handleChange(order.id, "itemQuantity", parseInt(e.target.value, 10))}
+                                        value={order.quantity || ""}
+                                        onChange={(e) => handleChange(order._id, "quantity", parseInt(e.target.value, 10))}
                                         className="w-full"
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Select
                                         value={order.status}
-                                        onValueChange={(value) => handleChange(order.id, "status", value)}
+                                        onValueChange={(value) => handleChange(order._id, "status", value)}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue>{order.status}</SelectValue>
@@ -140,7 +188,7 @@ const AllOrders = () => {
                                 <TableCell>
                                     <DatePicker
                                         date={order.paymentDate}
-                                        onSelect={(date) => handleChange(order.id, "paymentDate", date)}
+                                        onSelect={(date) => handleChange(order._id, "paymentDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -151,7 +199,7 @@ const AllOrders = () => {
                                     />
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="destructive" onClick={() => handleDelete(order.id)}>
+                                    <Button variant="destructive" onClick={() => handleDelete(order._id)}>
                                         Delete
                                     </Button>
                                 </TableCell>
@@ -161,14 +209,17 @@ const AllOrders = () => {
                 </Table>
             </div>
         </div>
-    )
-}
+    );
+};
 
 function DatePicker({ date, onSelect }) {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                <Button
+                    variant="outline"
+                    className="w-[150px] justify-start text-left font-normal text-sm truncate"
+                >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
@@ -177,7 +228,9 @@ function DatePicker({ date, onSelect }) {
                 <Calendar mode="single" selected={date || undefined} onSelect={onSelect} initialFocus />
             </PopoverContent>
         </Popover>
-    )
-};
+    );
+}
+
+
 
 export default AllOrders;
