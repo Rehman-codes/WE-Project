@@ -1,22 +1,48 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon } from 'lucide-react'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 const CreateContract = () => {
-    const [startDate, setStartDate] = useState()
-    const [endDate, setEndDate] = useState()
+    const [formData, setFormData] = useState({
+        contractTitle: "",
+        supplierName: "",
+        startDate: null,
+        endDate: null,
+        termsAndConditions: "",
+    });
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        // Handle form submission here
-        console.log('Form submitted')
-    }
+    const handleChange = (event) => {
+        const { id, value } = event.target;
+        setFormData((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handleDateChange = (key, date) => {
+        setFormData((prev) => ({ ...prev, [key]: date }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await fetch("http://localhost:3000/contract/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                console.log("Contract created successfully");
+            } else {
+                console.error("Failed to create contract");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
 
     return (
         <div>
@@ -27,14 +53,20 @@ const CreateContract = () => {
                     <label htmlFor="contractTitle" className="block text-sm font-medium text-gray-700 mb-1">
                         Contract Title
                     </label>
-                    <Input id="contractTitle" required placeholder="Enter contract title" />
+                    <Input
+                        id="contractTitle"
+                        value={formData.contractTitle}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter contract title"
+                    />
                 </div>
 
                 <div>
                     <label htmlFor="supplierName" className="block text-sm font-medium text-gray-700 mb-1">
                         Supplier Name
                     </label>
-                    <Select required>
+                    <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, supplierName: value }))} required>
                         <SelectTrigger id="supplierName">
                             <SelectValue placeholder="Select supplier" />
                         </SelectTrigger>
@@ -54,17 +86,17 @@ const CreateContract = () => {
                         <PopoverTrigger asChild>
                             <Button
                                 variant={"outline"}
-                                className={`w-full justify-start text-left font-normal ${!startDate && "text-muted-foreground"}`}
+                                className={`w-full justify-start text-left font-normal ${!formData.startDate && "text-muted-foreground"}`}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                                {formData.startDate ? format(formData.startDate, "PPP") : <span>Pick a date</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={startDate}
-                                onSelect={setStartDate}
+                                selected={formData.startDate}
+                                onSelect={(date) => handleDateChange("startDate", date)}
                                 initialFocus
                             />
                         </PopoverContent>
@@ -79,17 +111,17 @@ const CreateContract = () => {
                         <PopoverTrigger asChild>
                             <Button
                                 variant={"outline"}
-                                className={`w-full justify-start text-left font-normal ${!endDate && "text-muted-foreground"}`}
+                                className={`w-full justify-start text-left font-normal ${!formData.endDate && "text-muted-foreground"}`}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                                {formData.endDate ? format(formData.endDate, "PPP") : <span>Pick a date</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={endDate}
-                                onSelect={setEndDate}
+                                selected={formData.endDate}
+                                onSelect={(date) => handleDateChange("endDate", date)}
                                 initialFocus
                             />
                         </PopoverContent>
@@ -100,13 +132,19 @@ const CreateContract = () => {
                     <label htmlFor="termsAndConditions" className="block text-sm font-medium text-gray-700 mb-1">
                         Terms and Conditions
                     </label>
-                    <Textarea id="termsAndConditions" required placeholder="Enter terms and conditions" />
+                    <Textarea
+                        id="termsAndConditions"
+                        value={formData.termsAndConditions}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter terms and conditions"
+                    />
                 </div>
 
                 <Button type="submit" className="w-full">Create</Button>
             </form>
         </div>
-    )
+    );
 };
 
 export default CreateContract;

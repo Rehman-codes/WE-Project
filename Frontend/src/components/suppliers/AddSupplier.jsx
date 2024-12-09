@@ -1,15 +1,49 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "../ui/textarea"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const performanceOptions = ["Excellent", "Good", "Average", "Poor"];
 
 const AddSupplier = () => {
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        // Handle form submission logic here
-        console.log('Form submitted')
-    }
+    const [formData, setFormData] = useState({
+        supplierName: "",
+        email: "",
+        phone: "",
+        address: "",
+        companyName: "",
+        performance: "",
+    });
+
+    const handleChange = (event) => {
+        const { id, value } = event.target;
+        setFormData((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handlePerformanceChange = (value) => {
+        setFormData((prev) => ({ ...prev, performance: value }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await fetch("http://localhost:3000/supplier/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                console.log("Supplier added successfully");
+            } else {
+                console.error("Failed to add supplier");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
 
     return (
         <div className="flex items-center justify-center">
@@ -19,25 +53,30 @@ const AddSupplier = () => {
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="supplierName">Supplier Name</Label>
-                            <Input id="supplierName" required />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" required />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input id="phone" type="tel" required />
-                        </div>
+                        {["supplierName", "email", "phone", "companyName"].map((field) => (
+                            <div key={field} className="space-y-2">
+                                <Label htmlFor={field}>{field.replace(/([A-Z])/g, " $1")}</Label>
+                                <Input id={field} value={formData[field]} onChange={handleChange} required />
+                            </div>
+                        ))}
                         <div className="space-y-2">
                             <Label htmlFor="address">Address</Label>
-                            <Textarea id="address" required />
+                            <Textarea id="address" value={formData.address} onChange={handleChange} required />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="companyName">Company Name</Label>
-                            <Input id="companyName" required />
+                            <Label htmlFor="performance">Performance</Label>
+                            <Select onValueChange={handlePerformanceChange} required>
+                                <SelectTrigger id="performance">
+                                    <SelectValue placeholder="Select performance" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {performanceOptions.map((option) => (
+                                        <SelectItem key={option} value={option}>
+                                            {option}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -46,7 +85,7 @@ const AddSupplier = () => {
                 </form>
             </Card>
         </div>
-    )
+    );
 };
 
 export default AddSupplier;

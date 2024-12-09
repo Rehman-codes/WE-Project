@@ -59,21 +59,11 @@ const AllSuppliers = () => {
                             <TableRow key={supplier.id}>
                                 <TableCell>{supplier.id}</TableCell>
                                 <TableCell>
-                                    <Select
+                                    <Input
                                         value={supplier.supplierName}
-                                        onValueChange={(value) => handleChange(supplier.id, "supplierName", value)}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue>{supplier.supplierName}</SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {supplierNames.map((name) => (
-                                                <SelectItem key={name} value={name}>
-                                                    {name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                        onChange={(e) => handleChange(supplier.id, "supplierName", e.target.value)}
+                                        className="w-full"
+                                    />
                                 </TableCell>
                                 <TableCell>
                                     <Input
