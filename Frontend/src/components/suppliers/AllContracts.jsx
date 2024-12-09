@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,32 +12,85 @@ import { CalendarIcon } from 'lucide-react'
 const supplierNames = ["Supplier X", "Supplier Y", "Supplier Z"]
 
 const AllContracts = () => {
-    const [contracts, setContracts] = useState([
-        {
-            id: 1,
-            supplierName: "Supplier X",
-            title: "Contract A",
-            startDate: new Date(),
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            terms: "Terms and conditions of Contract A",
-        },
-    ])
+    const [contracts, setContracts] = useState([])
 
+    // Fetch contracts from the API when the component mounts
+    useEffect(() => {
+        const fetchContracts = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/contract/all")
+                if (response.ok) {
+                    const data = await response.json()
+                    setContracts(data)
+                    console.log(data)
+                } else {
+                    alert("Failed to load contracts.")
+                }
+            } catch (error) {
+                console.error("Error fetching contracts:", error)
+                alert("Error fetching contracts.")
+            }
+        }
+
+        fetchContracts()
+    }, [])
+
+    // Update contract in the local state and send API request to update the database
     const handleChange = (id, field, value) => {
-        setContracts((prevContracts) =>
-            prevContracts.map((contract) =>
-                contract.id === id
+        setContracts((prevContracts) => {
+            const updatedContracts = prevContracts.map((contract) =>
+                contract._id === id
                     ? {
                         ...contract,
                         [field]: value,
                     }
                     : contract
             )
-        )
+            const updatedContract = updatedContracts.find((contract) => contract._id === id)
+            handleUpdate(updatedContract) // Pass the updated contract directly
+            return updatedContracts
+        })
     }
 
-    const handleDelete = (id) => {
-        setContracts((prevContracts) => prevContracts.filter((contract) => contract.id !== id))
+    // API call to update contract
+    const handleUpdate = async (updatedContract) => {
+        try {
+            const response = await fetch(`http://localhost:3000/contract/${updatedContract._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedContract),
+            })
+
+            if (response.ok) {
+                console.log("Contract updated successfully")
+            } else {
+                alert("Failed to update the contract")
+            }
+        } catch (error) {
+            console.error("Error updating contract:", error)
+            alert("Error updating the contract")
+        }
+    }
+
+    // API call to delete contract
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/contract/${id}`, {
+                method: "DELETE",
+            })
+
+            if (response.ok) {
+                setContracts((prevContracts) => prevContracts.filter((contract) => contract._id !== id))
+                console.log("Contract deleted successfully")
+            } else {
+                alert("Failed to delete contract")
+            }
+        } catch (error) {
+            console.error("Error deleting contract:", error)
+            alert("Error deleting contract")
+        }
     }
 
     return (
@@ -56,13 +109,13 @@ const AllContracts = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {contracts.map((contract) => (
-                            <TableRow key={contract.id}>
-                                <TableCell>{contract.id}</TableCell>
+                        {contracts.map((contract, index) => (
+                            <TableRow key={contract._id}>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>
                                     <Select
                                         value={contract.supplierName}
-                                        onValueChange={(value) => handleChange(contract.id, "supplierName", value)}
+                                        onValueChange={(value) => handleChange(contract._id, "supplierName", value)}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue>{contract.supplierName}</SelectValue>
@@ -78,32 +131,32 @@ const AllContracts = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Input
-                                        value={contract.title}
-                                        onChange={(e) => handleChange(contract.id, "title", e.target.value)}
+                                        value={contract.contractTitle}
+                                        onChange={(e) => handleChange(contract._id, "contractTitle", e.target.value)}
                                         className="w-full"
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <DatePicker
                                         date={contract.startDate}
-                                        onSelect={(date) => handleChange(contract.id, "startDate", date)}
+                                        onSelect={(date) => handleChange(contract._id, "startDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <DatePicker
                                         date={contract.endDate}
-                                        onSelect={(date) => handleChange(contract.id, "endDate", date)}
+                                        onSelect={(date) => handleChange(contract._id, "endDate", date)}
                                     />
                                 </TableCell>
                                 <TableCell>
                                     <Textarea
-                                        value={contract.terms}
-                                        onChange={(e) => handleChange(contract.id, "terms", e.target.value)}
+                                        value={contract.termsAndConditions}
+                                        onChange={(e) => handleChange(contract._id, "termsAndConditions", e.target.value)}
                                         className="w-full"
                                     />
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="destructive" onClick={() => handleDelete(contract.id)}>
+                                    <Button variant="destructive" onClick={() => handleDelete(contract._id)}>
                                         Delete
                                     </Button>
                                 </TableCell>
