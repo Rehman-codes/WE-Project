@@ -15,7 +15,7 @@ const AllItems = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await fetch("http://localhost:3000/item/all");
+                const response = await fetch(`${API_URL}/item/all`);
                 if (response.ok) {
                     const data = await response.json();
                     setItems(data);
@@ -50,7 +50,7 @@ const AllItems = () => {
     // API call to update item
     const handleUpdate = async (updatedItem) => {
         try {
-            const response = await fetch(`http://localhost:3000/item/${updatedItem._id}`, {
+            const response = await fetch(`${API_URL}/item/${updatedItem._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const AllItems = () => {
     // API call to delete item
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/item/${id}`, {
+            const response = await fetch(`${API_URL}/item/${id}`, {
                 method: "DELETE",
             });
 
