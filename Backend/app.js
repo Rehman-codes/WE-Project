@@ -11,6 +11,7 @@ import supplierRoutes from "./src/routes/supplierRoutes.js";
 import orderRoutes from "./src/routes/orderRoutes.js";
 import adjustmentRoutes from "./src/routes/adjustmentRoutes.js";
 import itemRoutes from "./src/routes/itemRoutes.js";
+import rootRoutes from "./src/routes/root.js";
 
 const app = express();
 
@@ -20,12 +21,13 @@ app.use(express.json());
 
 connectDB();
 
+app.use("/", rootRoutes);
 app.use("/item", itemRoutes);
 app.use("/adjustment", adjustmentRoutes);
 app.use("/order", orderRoutes);
 app.use("/supplier", supplierRoutes);
 app.use("/contract", contractRoutes);
 app.use("/inspectionReport", inspectionReportRoutes);
-app.use("/", "Root");
+
 
 export default app;
