@@ -32,6 +32,8 @@ const CreateOrder = () => {
     totalPrice: 0,
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (formData.orderItem && formData.quantity) {
       setFormData((prevData) => ({
@@ -57,7 +59,7 @@ const CreateOrder = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/order/create", {
+      const response = await fetch(`${API_URL}/order/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend),

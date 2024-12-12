@@ -15,11 +15,13 @@ const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancell
 const AllOrders = () => {
     const [orders, setOrders] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Fetch orders from the API when the component mounts
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch("http://localhost:3000/order/all");
+                const response = await fetch(`${API_URL}/order/all`);
                 if (response.ok) {
                     const data = await response.json();
                     setOrders(data);
@@ -53,7 +55,7 @@ const AllOrders = () => {
     // Modify handleUpdate to accept the updated order and update the DB
     const handleUpdate = async (updatedOrder) => {
         try {
-            const response = await fetch(`http://localhost:3000/order/${updatedOrder._id}`, {
+            const response = await fetch(`${API_URL}/order/${updatedOrder._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +78,7 @@ const AllOrders = () => {
     // API call to delete order
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/order/${id}`, {
+            const response = await fetch(`${API_URL}/order/${id}`, {
                 method: "DELETE",
             });
 

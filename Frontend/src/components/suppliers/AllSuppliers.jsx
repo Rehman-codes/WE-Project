@@ -10,11 +10,13 @@ const performanceOptions = ["Excellent", "Good", "Average", "Poor"];
 const AllSuppliers = () => {
     const [suppliers, setSuppliers] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Fetch suppliers from the API when the component mounts
     useEffect(() => {
         const fetchSuppliers = async () => {
             try {
-                const response = await fetch("http://localhost:3000/supplier/all");
+                const response = await fetch(`${API_URL}/supplier/all`);
                 if (response.ok) {
                     const data = await response.json();
                     setSuppliers(data);
@@ -51,7 +53,7 @@ const AllSuppliers = () => {
     // API call to update supplier
     const handleUpdate = async (updatedSupplier) => {
         try {
-            const response = await fetch(`http://localhost:3000/supplier/${updatedSupplier._id}`, {
+            const response = await fetch(`${API_URL}/supplier/${updatedSupplier._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,7 +75,7 @@ const AllSuppliers = () => {
     // API call to delete supplier
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/supplier/${id}`, {
+            const response = await fetch(`${API_URL}/supplier/${id}`, {
                 method: "DELETE",
             });
 

@@ -18,6 +18,8 @@ const AddSupplier = () => {
         performance: "",
     });
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const handleChange = (event) => {
         const { id, value } = event.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
@@ -30,7 +32,7 @@ const AddSupplier = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch("http://localhost:3000/supplier/create", {
+            const response = await fetch(`${API_URL}/supplier/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

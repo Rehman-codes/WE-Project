@@ -23,6 +23,8 @@ const CreateInspectionReport = () => {
     })
     const [error, setError] = useState('')
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Handle input changes for all fields
     const handleChange = (e) => {
         const { id, value } = e.target
@@ -60,7 +62,7 @@ const CreateInspectionReport = () => {
 
         try {
             // Send the data to the API (you can replace the URL with the actual one)
-            const response = await fetch("http://localhost:3000/inspectionReport/create", {
+            const response = await fetch(`${API_URL}/inspectionReport/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

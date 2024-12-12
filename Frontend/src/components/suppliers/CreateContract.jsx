@@ -17,6 +17,8 @@ const CreateContract = () => {
         termsAndConditions: "",
     });
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const handleChange = (event) => {
         const { id, value } = event.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
@@ -29,7 +31,7 @@ const CreateContract = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch("http://localhost:3000/contract/create", {
+            const response = await fetch(`${API_URL}/contract/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

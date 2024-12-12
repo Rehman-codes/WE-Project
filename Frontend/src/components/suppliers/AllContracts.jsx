@@ -14,11 +14,13 @@ const supplierNames = ["Supplier X", "Supplier Y", "Supplier Z"]
 const AllContracts = () => {
     const [contracts, setContracts] = useState([])
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Fetch contracts from the API when the component mounts
     useEffect(() => {
         const fetchContracts = async () => {
             try {
-                const response = await fetch("http://localhost:3000/contract/all")
+                const response = await fetch(`${API_URL}/contract/all`)
                 if (response.ok) {
                     const data = await response.json()
                     setContracts(data)
@@ -55,7 +57,7 @@ const AllContracts = () => {
     // API call to update contract
     const handleUpdate = async (updatedContract) => {
         try {
-            const response = await fetch(`http://localhost:3000/contract/${updatedContract._id}`, {
+            const response = await fetch(`${API_URL}/contract/${updatedContract._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -77,7 +79,7 @@ const AllContracts = () => {
     // API call to delete contract
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/contract/${id}`, {
+            const response = await fetch(`${API_URL}/contract/${id}`, {
                 method: "DELETE",
             })
 

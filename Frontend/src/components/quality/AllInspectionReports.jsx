@@ -17,11 +17,13 @@ const quantityCheckOptions = ["Correct", "Incorrect"];
 const AllInspectionReports = () => {
     const [reports, setReports] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Fetch inspection reports from the API when the component mounts
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await fetch("http://localhost:3000/inspectionReport/all");
+                const response = await fetch(`${API_URL}/inspectionReport/all`);
                 if (response.ok) {
                     const data = await response.json();
                     setReports(data);
@@ -56,7 +58,7 @@ const AllInspectionReports = () => {
     // API call to update inspection report
     const handleUpdate = async (updatedReport) => {
         try {
-            const response = await fetch(`http://localhost:3000/inspectionReport/${updatedReport._id}`, {
+            const response = await fetch(`${API_URL}/inspectionReport/${updatedReport._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +82,7 @@ const AllInspectionReports = () => {
     // API call to delete inspection report
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/inspectionReport/${id}`, {
+            const response = await fetch(`${API_URL}/inspectionReport/${id}`, {
                 method: "DELETE",
             });
 
