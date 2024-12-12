@@ -11,6 +11,8 @@ const suppliers = ["Supplier X", "Supplier Y", "Supplier Z"];
 const AllItems = () => {
     const [items, setItems] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     // Fetch items from the API when the component mounts
     useEffect(() => {
         const fetchItems = async () => {
