@@ -26,5 +26,6 @@ app.use("/order", orderRoutes);
 app.use("/supplier", supplierRoutes);
 app.use("/contract", contractRoutes);
 app.use("/inspectionReport", inspectionReportRoutes);
+app.use("/", "Root");
 
 export default app;
