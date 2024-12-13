@@ -14,10 +14,10 @@ const PieChart = () => {
         chartInstanceRef.current = new Chart(ctx, {
             type: "pie",
             data: {
-                labels: ["Category A", "Category B", "Category C"],
+                labels: ["Clothing", "Food", "Sports"],
                 datasets: [
                     {
-                        data: [30, 45, 25], // Dummy data
+                        data: [1, 0, 0], 
                         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
                         hoverOffset: 4,
                     },

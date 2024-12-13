@@ -14,11 +14,11 @@ const BarGraph = () => {
         chartInstanceRef.current = new Chart(ctx, {
             type: "bar",
             data: {
-                labels: ["Item A", "Item B", "Item C", "Item D"], // Dummy item labels
+                labels: ["Socks", "base balls"],
                 datasets: [
                     {
                         label: "Quantities",
-                        data: [10, 20, 15, 25], // Dummy quantities
+                        data: [1, 0],
                         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
                         borderColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
                         borderWidth: 1,
